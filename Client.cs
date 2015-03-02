@@ -21,7 +21,7 @@ namespace SquareSharp
             this.httpClient = new HttpClient();
             this.httpClient.DefaultRequestHeaders.Authorization = 
                 new AuthenticationHeaderValue("Bearer", accessToken);
-
+            this.merchantID = merchantID;
         }
 
         async protected Task<T> parseResponse<T>(HttpResponseMessage response)
@@ -33,60 +33,60 @@ namespace SquareSharp
 
         async protected Task<T> fetch<T>(string path)
         {
-            var response = await httpClient.GetAsync(
-                "https://connect.squareup.com/api/v1/" + merchantID + path
-            );
-            return await parseResponse<T>(response);
+            var requestURL = "https://connect.squareup.com/v1/" + merchantID + path;
+            using (var response = await httpClient.GetAsync(requestURL))
+            {
+                return await parseResponse<T>(response);
+            }
         }
 
         async protected Task<T[]> fetchPaginated<T>(string path)
         {
             var results = new List<T>();
 
-            var requestURL = "https://connect.squareup.com/api/v1/" + merchantID + path;
+            var requestURL = "https://connect.squareup.com/v1/" + merchantID + path;
             while (true) // Keep fetching while we get back Link headers
             {
-                var response = await httpClient.GetAsync(requestURL);
+                using (var response = await httpClient.GetAsync(requestURL))
+                {
+                    results.AddRange(
+                        await parseResponse<T[]>(response)
+                    );
 
-                results.AddRange(
-                    await parseResponse<T[]>(response)
-               );
+                    IEnumerable<string> linkHeaders;
+                    if (!response.Headers.TryGetValues("Link", out linkHeaders)) break;
 
-                var linkHeaders = response.Headers.GetValues("Link");
-                if (!linkHeaders.Any()) break;
-
-                // Assuming a simple Link header format, parse out the URL for
-                // the next page of results
-                requestURL = linkHeaders.First().Split("<>".ToCharArray())[1];
+                    // Assuming a simple Link header format, parse out the URL for
+                    // the next page of results
+                    requestURL = linkHeaders.First().Split("<>".ToCharArray())[1];
+                }
             }
 
             return results.ToArray();
         }
 
-        async public Task<Merchant> getMerchant()
+        async public Task<Merchant> GetMerchant()
         {
             return await fetch<Merchant>(""); // This corresponds to "/api/1/:merchant_id"
         }
 
-        public Payment[] listPayments()
+        async public Task<Payment[]> ListPayments()
         {
-            return null; // TODO
+            return await fetchPaginated<Payment>("/payments");
         }
 
-
-
-        public Refund[] ListRefunds()
+        async public Task<Refund[]> ListRefunds()
         {
-            return null; // TODO
+            return await fetchPaginated<Refund>("/refunds");
         }
 
         /*
-        public Item[] ListItems()
+        async public Task<Item[]> ListItems()
         {
             return null; // TODO
         }
 
-        public InventoryEntry[] ListInventory()
+        async public Task<InventoryEntry[]> ListInventory()
         {
             return null; // TODO
         }
