@@ -1,8 +1,13 @@
-[DataContract]
-public class Device
+using System.Runtime.Serialization;
+
+namespace SquareSharp.Models
 {
-    [DataMember]
-    public string id;
-    [DataMember]
-    public string name;
+    [DataContract]
+    public class Device
+    {
+        [DataMember]
+        public string id;
+        [DataMember]
+        public string name;
+    }
 }

@@ -1,14 +1,19 @@
-[DataContract]
-public class PaymentTax
+using System.Runtime.Serialization;
+
+namespace SquareSharp.Models
 {
-    [DataMember]
-    public string name;
-    [DatMember(name="applied_money")]
-    public Money appliedMoney;
-    [DataMember]
-    public string rate;
-    [DataMember(name="inclusion_type")]
-    public string inclusionType;
-    [DataMember(name="fee_id")]
-    public string feeID;
+    [DataContract]
+    public class PaymentTax
+    {
+        [DataMember]
+        public string name;
+        [DataMember(Name = "applied_money")]
+        public Money appliedMoney;
+        [DataMember]
+        public string rate;
+        [DataMember(Name = "inclusion_type")]
+        public string inclusionType;
+        [DataMember(Name = "fee_id")]
+        public string feeID;
+    }
 }
