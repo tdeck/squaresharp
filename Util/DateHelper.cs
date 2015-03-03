@@ -4,9 +4,11 @@ namespace SquareSharp.Util
 {
     internal static class DateHelper
     {
-        public static string ToISO(DateTime dateTime)
+        public static string ToISO(DateTime? dateTime)
         {
-            return dateTime.ToString("o");
+            if (dateTime == null) return null;
+
+            return ((DateTime) dateTime).ToString("o");
         }
 
         public static DateTime FromISO(string isoTime)

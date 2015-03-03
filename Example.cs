@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using System;
 
 namespace SquareSharp
-{ 
+{
     public static class Example
     {
         async static Task getMerchant(Client client)
@@ -16,11 +16,11 @@ namespace SquareSharp
             Console.WriteLine("Email: " + merchant.email);
             Console.WriteLine("Business: " + merchant.businessName);
             Console.WriteLine(
-                "Phone: " 
-                + merchant.businessPhone.callingCode + " " 
+                "Phone: "
+                + merchant.businessPhone.callingCode + " "
                 + merchant.businessPhone.number
             );
-            
+
             Console.WriteLine();
         }
 
@@ -33,7 +33,7 @@ namespace SquareSharp
                 "ID".PadRight(32) +
                 "Time".PadRight(24) +
                 "Total ¢".PadRight(8)
-            );     
+            );
             foreach (var payment in await client.ListPayments())
             {
                 Console.WriteLine(

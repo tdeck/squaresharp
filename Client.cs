@@ -7,7 +7,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
 using System.Collections;
+using System.Collections.Specialized;
 using SquareSharp.Models;
+using SquareSharp.Util;
 
 namespace SquareSharp
 {
@@ -19,7 +21,7 @@ namespace SquareSharp
         public Client(string accessToken, string merchantID = "me")
         {
             this.httpClient = new HttpClient();
-            this.httpClient.DefaultRequestHeaders.Authorization = 
+            this.httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", accessToken);
             this.merchantID = merchantID;
         }
@@ -31,21 +33,27 @@ namespace SquareSharp
             return (T)(new DataContractJsonSerializer(typeof(T))).ReadObject(jsonStream);
         }
 
-        async protected Task<T> fetch<T>(string path)
+        async protected Task<T> fetch<T>(string path, NameValueCollection query = null)
         {
-            var requestURL = "https://connect.squareup.com/v1/" + merchantID + path;
+            var requestURL = "https://connect.squareup.com/v1/" + merchantID + path
+                + QueryString.Encode(query);
             using (var response = await httpClient.GetAsync(requestURL))
             {
                 return await parseResponse<T>(response);
             }
         }
 
-        async protected Task<T[]> fetchPaginated<T>(string path)
+        async protected Task<T[]> fetchPaginated<T>(
+            string path,
+            NameValueCollection query = null,
+            int limit = int.MaxValue
+        )
         {
             var results = new List<T>();
 
-            var requestURL = "https://connect.squareup.com/v1/" + merchantID + path;
-            while (true) // Keep fetching while we get back Link headers
+            var requestURL = "https://connect.squareup.com/v1/" + merchantID + path
+                + QueryString.Encode(query);
+            while (results.Count() < limit) // Keep fetching while we get back Link headers
             {
                 using (var response = await httpClient.GetAsync(requestURL))
                 {
@@ -62,7 +70,7 @@ namespace SquareSharp
                 }
             }
 
-            return results.ToArray();
+            return results.Take(limit).ToArray();
         }
 
         async public Task<Merchant> GetMerchant()
@@ -70,14 +78,42 @@ namespace SquareSharp
             return await fetch<Merchant>(""); // This corresponds to "/api/1/:merchant_id"
         }
 
-        async public Task<Payment[]> ListPayments()
+        async public Task<Payment[]> ListPayments(
+            DateTime? beginTime = null,
+            DateTime? endTime = null,
+            Order order = Order.ASC,
+            int limit = int.MaxValue
+        )
         {
-            return await fetchPaginated<Payment>("/payments");
+            return await fetchPaginated<Payment>(
+                "/payments",
+                new NameValueCollection() {
+                    {"begin_time", DateHelper.ToISO(beginTime)},
+                    {"end_time", DateHelper.ToISO(endTime)},
+                    {"order", order.ToString()},
+                    {"limit", Math.Min(200, limit).ToString()}
+                },
+                limit
+            );
         }
 
-        async public Task<Refund[]> ListRefunds()
+        async public Task<Refund[]> ListRefunds(
+            DateTime? beginTime = null,
+            DateTime? endTime = null,
+            Order order = Order.ASC,
+            int limit = int.MaxValue
+        )
         {
-            return await fetchPaginated<Refund>("/refunds");
+            return await fetchPaginated<Refund>(
+                "/refunds",
+                new NameValueCollection() {
+                    {"begin_time", DateHelper.ToISO(beginTime)},
+                    {"end_time", DateHelper.ToISO(endTime)},
+                    {"order", order.ToString()},
+                    {"limit", Math.Min(200, limit).ToString()}
+                },
+                limit
+            );
         }
 
         /*
@@ -92,4 +128,6 @@ namespace SquareSharp
         }
         */
     }
+
+    public enum Order {ASC, DESC};
 }
