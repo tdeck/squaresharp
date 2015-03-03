@@ -116,12 +116,18 @@ namespace SquareSharp
             );
         }
 
-        /*
-        async public Task<Item[]> ListItems()
+        async public Task<Item[]> ListItems(int limit = int.MaxValue)
         {
-            return null; // TODO
+            return await fetchPaginated<Item>(
+                "/items",
+                new NameValueCollection() {
+                    {"limit", Math.Min(1000, limit).ToString()}
+                },
+                limit
+            );
         }
 
+        /*
         async public Task<InventoryEntry[]> ListInventory()
         {
             return null; // TODO
