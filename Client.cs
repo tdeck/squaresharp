@@ -127,12 +127,10 @@ namespace SquareSharp
             );
         }
 
-        /*
         async public Task<InventoryEntry[]> ListInventory()
         {
-            return null; // TODO
+            return await fetchPaginated<InventoryEntry>("/inventory");
         }
-        */
     }
 
     public enum Order {ASC, DESC};

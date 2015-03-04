@@ -71,6 +71,48 @@ namespace SquareSharp
             Console.WriteLine();
         }
 
+        async static Task getAllItems(Client client)
+        {
+            Console.WriteLine("Items");
+            Console.WriteLine("=====");
+
+            Console.WriteLine(
+                "ID".PadRight(64) +
+                "Name".PadRight(50) +
+                "Description"
+            );
+            foreach (var item in await client.ListItems())
+            {
+                Console.WriteLine(
+                    item.id.PadRight(64) +
+                    item.name.PadRight(50) +
+                    item.description
+                );
+            }
+
+            Console.WriteLine();
+        }
+
+        async static Task getAllInventory(Client client)
+        {
+            Console.WriteLine("Inventory");
+            Console.WriteLine("=========");
+
+            Console.WriteLine(
+                "Variation ID".PadRight(64) +
+                "Quantity"
+            );
+            foreach (var entry in await client.ListInventory())
+            {
+                Console.WriteLine(
+                    entry.variationID.PadRight(64) +
+                    entry.quantityOnHand
+                );
+            }
+
+            Console.WriteLine();
+        }
+
         public static void Main()
         {
             Console.Write("Token: ");
@@ -80,6 +122,8 @@ namespace SquareSharp
                     await getMerchant(client);
                     await getAllPayments(client);
                     await getAllRefunds(client);
+                    await getAllItems(client);
+                    await getAllInventory(client);
                 }
             ).Wait();
         }
