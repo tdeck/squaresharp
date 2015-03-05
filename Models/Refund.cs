@@ -4,13 +4,25 @@ using System;
 namespace SquareSharp.Models
 {
     [DataContract]
+    /// <summary>
+    /// Represents a refund initiated by a Square merchant.
+    /// </summary>
     public class Refund
     {
         [DataMember]
+        /// <summary>
+        /// The type of refund (FULL or PARTIAL).
+        /// </summary>
         public string type;
         [DataMember]
+        /// <summary>
+        /// The merchant-specified reason for the refund.
+        /// </summary>
         public string reason;
         [DataMember(Name = "refunded_money")]
+        /// <summary>
+        /// The amount of money refunded. This amount is always negative.
+        /// </summary>
         public Money refundedMoney;
         [DataMember]
         private string created_at;
@@ -31,6 +43,9 @@ namespace SquareSharp.Models
             }
         }
         [DataMember(Name = "payment_id")]
+        /// <summary>
+        /// The Square-issued ID of the payment the refund is applied to.
+        /// </summary>
         public string paymentID;
     }
 }
