@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using SquareSharp.Models;
 using SquareSharp.Util;
+using System.Reflection;
 
 namespace SquareSharp
 {
@@ -22,6 +23,10 @@ namespace SquareSharp
             this.httpClient = new HttpClient();
             this.httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", accessToken);
+            this.httpClient.DefaultRequestHeaders.Add(
+                "User-Agent",
+                "SquareSharp/" + typeof(Client).Assembly.GetName().Version
+            );
         }
 
         async protected Task<T> parseResponse<T>(HttpResponseMessage response)

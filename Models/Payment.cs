@@ -103,6 +103,6 @@ namespace SquareSharp.Models
         /// <summary>
         /// The items purchased in the payment.
         /// </summary>
-        public Itemization[] itemizations;
+        public PaymentItemization[] itemizations;
     }
 }
