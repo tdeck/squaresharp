@@ -15,15 +15,13 @@ namespace SquareSharp
 {
     public class Client
     {
-        private string merchantID;
         private HttpClient httpClient;
 
-        public Client(string accessToken, string merchantID = "me")
+        public Client(string accessToken)
         {
             this.httpClient = new HttpClient();
             this.httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", accessToken);
-            this.merchantID = merchantID;
         }
 
         async protected Task<T> parseResponse<T>(HttpResponseMessage response)
@@ -33,7 +31,7 @@ namespace SquareSharp
             return (T)(new DataContractJsonSerializer(typeof(T))).ReadObject(jsonStream);
         }
 
-        async protected Task<T> fetch<T>(string path, NameValueCollection query = null)
+        async protected Task<T> fetch<T>(string merchantID, string path, NameValueCollection query = null)
         {
             var requestURL = "https://connect.squareup.com/v1/" + merchantID + path
                 + QueryString.Encode(query);
@@ -44,6 +42,7 @@ namespace SquareSharp
         }
 
         async protected Task<T[]> fetchPaginated<T>(
+            string merchantID,
             string path,
             NameValueCollection query = null,
             int limit = int.MaxValue
@@ -73,12 +72,13 @@ namespace SquareSharp
             return results.Take(limit).ToArray();
         }
 
-        async public Task<Merchant> GetMerchant()
+        async public Task<Merchant> GetMerchant(string merchantID = "me")
         {
-            return await fetch<Merchant>(""); // This corresponds to "/api/1/:merchant_id"
+            return await fetch<Merchant>(merchantID, ""); // This corresponds to "/api/1/:merchant_id"
         }
 
         async public Task<Payment[]> ListPayments(
+            string merchantID = "me",
             DateTime? beginTime = null,
             DateTime? endTime = null,
             Order order = Order.ASC,
@@ -86,6 +86,7 @@ namespace SquareSharp
         )
         {
             return await fetchPaginated<Payment>(
+                merchantID,
                 "/payments",
                 new NameValueCollection() {
                     {"begin_time", DateHelper.ToISO(beginTime)},
@@ -98,6 +99,7 @@ namespace SquareSharp
         }
 
         async public Task<Refund[]> ListRefunds(
+            string merchantID = "me",
             DateTime? beginTime = null,
             DateTime? endTime = null,
             Order order = Order.ASC,
@@ -105,6 +107,7 @@ namespace SquareSharp
         )
         {
             return await fetchPaginated<Refund>(
+                merchantID,
                 "/refunds",
                 new NameValueCollection() {
                     {"begin_time", DateHelper.ToISO(beginTime)},
@@ -116,9 +119,10 @@ namespace SquareSharp
             );
         }
 
-        async public Task<Item[]> ListItems(int limit = int.MaxValue)
+        async public Task<Item[]> ListItems(string merchantID = "me", int limit = int.MaxValue)
         {
             return await fetchPaginated<Item>(
+                merchantID,
                 "/items",
                 new NameValueCollection() {
                     {"limit", Math.Min(1000, limit).ToString()}
@@ -127,9 +131,9 @@ namespace SquareSharp
             );
         }
 
-        async public Task<InventoryEntry[]> ListInventory()
+        async public Task<InventoryEntry[]> ListInventory(string merchantID = "me")
         {
-            return await fetchPaginated<InventoryEntry>("/inventory");
+            return await fetchPaginated<InventoryEntry>(merchantID, "/inventory");
         }
     }
 
