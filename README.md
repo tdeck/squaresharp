@@ -5,7 +5,7 @@ SquareSharp is a C# client library for the [Square Connect API](https://docs.con
 # Usage
 ```csharp
 // Create a client
-var client = new SquareClient("<your-access-token"); // Do not check your token into GitHub
+var client = new SquareClient("your-access-token"); // Do not check your token into GitHub
 
 // Get some merchant details
 var merchant = await SquareClient.GetMerchant();
