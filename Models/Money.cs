@@ -18,5 +18,19 @@ namespace SquareSharp.Models
         /// The type of currency involved in the current payment. The currency code for US dollars is USD.
         /// </summary>
         public string currencyCode;
+
+        public override string ToString()
+        {
+            // This is a rather crude currency formatter
+            switch (currencyCode) {
+                case "USD":
+                case "CAD":
+                    return (amount / 100).ToString("C");
+                case "JPY":
+                    return "¥" + amount;
+                default:
+                    return amount + " " + currencyCode;
+            }
+        }
     }
 }

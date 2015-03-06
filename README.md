@@ -18,7 +18,7 @@ Console.WriteLine("Business: " + merchant.businessName);
 var payments = await SquareClient.ListPayments();
 foreach (var payment in payments)
 {
-    Console.WriteLine(payment.totalCollectedMoney.amount + "¢")
+    Console.WriteLine(payment.createdAt + " - " + payment.totalCollectedMoney);
 }
 ```
 # Development
