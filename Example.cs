@@ -5,7 +5,7 @@ namespace SquareSharp
 {
     public static class Example
     {
-        async static Task getMerchant(Client client)
+        async static Task getMerchant(SquareClient client)
         {
             Console.WriteLine("Merchant");
             Console.WriteLine("========");
@@ -24,7 +24,7 @@ namespace SquareSharp
             Console.WriteLine();
         }
 
-        async static Task getAllPayments(Client client)
+        async static Task getAllPayments(SquareClient client)
         {
             Console.WriteLine("Payments");
             Console.WriteLine("========");
@@ -46,7 +46,7 @@ namespace SquareSharp
             Console.WriteLine();
         }
 
-        async static Task getAllRefunds(Client client)
+        async static Task getAllRefunds(SquareClient client)
         {
             Console.WriteLine("Refunds");
             Console.WriteLine("=======");
@@ -71,7 +71,7 @@ namespace SquareSharp
             Console.WriteLine();
         }
 
-        async static Task getAllItems(Client client)
+        async static Task getAllItems(SquareClient client)
         {
             Console.WriteLine("Items");
             Console.WriteLine("=====");
@@ -93,7 +93,7 @@ namespace SquareSharp
             Console.WriteLine();
         }
 
-        async static Task getAllInventory(Client client)
+        async static Task getAllInventory(SquareClient client)
         {
             Console.WriteLine("Inventory");
             Console.WriteLine("=========");
@@ -116,7 +116,7 @@ namespace SquareSharp
         public static void Main()
         {
             Console.Write("Token: ");
-            var client = new Client(Console.ReadLine().Trim());
+            var client = new SquareClient(Console.ReadLine().Trim());
             Task.Run(async() =>
                 {
                     await getMerchant(client);

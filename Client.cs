@@ -14,20 +14,20 @@ using System.Reflection;
 
 namespace SquareSharp
 {
-    public class Client
+    public class SquareClient
     {
         private HttpClient httpClient;
 
         /// <summary>Creates a Square Connect API client.</summary>
         /// <param name="accessToken">Your application's OAuth access token.</param>
-        public Client(string accessToken)
+        public SquareClient(string accessToken)
         {
             this.httpClient = new HttpClient();
             this.httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", accessToken);
             this.httpClient.DefaultRequestHeaders.Add(
                 "User-Agent",
-                "SquareSharp/" + typeof(Client).Assembly.GetName().Version
+                "SquareSharp/" + typeof(SquareClient).Assembly.GetName().Version
             );
         }
 
