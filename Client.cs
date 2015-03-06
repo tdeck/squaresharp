@@ -18,6 +18,8 @@ namespace SquareSharp
     {
         private HttpClient httpClient;
 
+        /// <summary>Creates a Square Connect API client.</summary>
+        /// <param name="accessToken">Your application's OAuth access token.</param>
         public Client(string accessToken)
         {
             this.httpClient = new HttpClient();
@@ -27,6 +29,161 @@ namespace SquareSharp
                 "User-Agent",
                 "SquareSharp/" + typeof(Client).Assembly.GetName().Version
             );
+        }
+
+        /// <summary>Returns details about a merchant.</summary>
+        /// <param name="merchantID">
+        /// The merchant's ID. Defaults to the client's owner if omitted.
+        /// </param>
+        async public Task<Merchant> GetMerchant(string merchantID = "me")
+        {
+            return await fetch<Merchant>(merchantID, ""); // This corresponds to "/api/1/:merchant_id"
+        }
+
+        /// <summary>
+        /// Returns a list of all a merchant's payment records.
+        /// </summary>
+        /// <param name="merchantID">
+        /// The merchant's ID. Defaults to the client's owner if omitted.
+        /// </param>
+        /// <param name="beginTime">
+        /// The beginning of the requested reporting period.
+        /// If this value is before January 1, 2013 (2013-01-01T00:00:00Z), this endpoint returns an error.
+        /// Defaults to the current time minus one year.
+        /// </param>
+        /// <param name="endTime">
+        /// The end of the requested reporting period.
+        /// If this value is less than or equal to beginTime, this endpoint returns an error.
+        /// Defaults to the current time.
+        /// </param>
+        /// <param name="order">
+        /// The order in which payments are listed in the response. Defaults to ASC.
+        /// </param>
+        /// <param name="limit">
+        /// The maximum number of results to return. Defaults to all results if omitted.
+        /// </param>
+        async public Task<Payment[]> ListPayments(
+            string merchantID = "me",
+            DateTime? beginTime = null,
+            DateTime? endTime = null,
+            Order order = Order.ASC,
+            int limit = int.MaxValue
+        )
+        {
+            return await fetchPaginated<Payment>(
+                merchantID,
+                "/payments",
+                new NameValueCollection() {
+                    {"begin_time", DateHelper.ToISO(beginTime)},
+                    {"end_time", DateHelper.ToISO(endTime)},
+                    {"order", order.ToString()},
+                    {"limit", Math.Min(200, limit).ToString()}
+                },
+                limit
+            );
+        }
+
+        /// <summary>
+        /// Returns a single payment.
+        /// </summary>
+        /// <param name="merchantID">
+        /// The merchant's ID. Defaults to the client's owner if omitted.
+        /// </param>
+        /// <param name="paymentID">
+        /// The ID of the payment.
+        /// </param>
+        async public Task<Payment> GetPayment(string paymentID, string merchantID = "me")
+        {
+            return await fetch<Payment>(merchantID, "/payments/" + paymentID);
+        }
+
+        /// <summary>
+        /// Returns a list of all a merchant's refunds.
+        /// </summary>
+        /// <param name="merchantID">
+        /// The merchant's ID. Defaults to the client's owner if omitted.
+        /// </param>
+        /// <param name="beginTime">
+        /// The beginning of the requested reporting period.
+        /// If this value is before January 1, 2013 (2013-01-01T00:00:00Z), this endpoint returns an error.
+        /// Defaults to the current time minus one year.
+        /// </param>
+        /// <param name="endTime">
+        /// The end of the requested reporting period.
+        /// If this value is less than or equal to beginTime, this endpoint returns an error.
+        /// Defaults to the current time.
+        /// </param>
+        /// <param name="order">
+        /// The order in which refunds are listed in the response. Defaults to ASC.
+        /// </param>
+        /// <param name="limit">
+        /// The maximum number of results to return. Defaults to all results if omitted.
+        /// </param>
+        async public Task<Refund[]> ListRefunds(
+            string merchantID = "me",
+            DateTime? beginTime = null,
+            DateTime? endTime = null,
+            Order order = Order.ASC,
+            int limit = int.MaxValue
+        )
+        {
+            return await fetchPaginated<Refund>(
+                merchantID,
+                "/refunds",
+                new NameValueCollection() {
+                    {"begin_time", DateHelper.ToISO(beginTime)},
+                    {"end_time", DateHelper.ToISO(endTime)},
+                    {"order", order.ToString()},
+                    {"limit", Math.Min(200, limit).ToString()}
+                },
+                limit
+            );
+        }
+
+        /// <summary>
+        /// Returns a list of all a merchant's items.
+        /// </summary>
+        /// <param name="merchantID">
+        /// The merchant's ID. Defaults to the client's owner if omitted.
+        /// </param>
+        /// <param name="limit">
+        /// The maximum number of results to return. Defaults to all results if omitted.
+        /// </param>
+        async public Task<Item[]> ListItems(int limit = int.MaxValue, string merchantID = "me")
+        {
+            return await fetchPaginated<Item>(
+                merchantID,
+                "/items",
+                new NameValueCollection() {
+                    {"limit", Math.Min(1000, limit).ToString()}
+                },
+                limit
+            );
+        }
+
+        /// <summary>
+        /// Returns a single item.
+        /// </summary>
+        /// <param name="merchantID">
+        /// The merchant's ID. Defaults to the client's owner if omitted.
+        /// </param>
+        /// <param name="paymentID">
+        /// The ID of the item.
+        /// </param>
+        async public Task<Item> GetItem(string itemID, string merchantID = "me")
+        {
+            return await fetch<Item>(merchantID, "/items/" + itemID);
+        }
+
+        /// <summary>
+        /// Returns inventory information for all of a merchant's inventory-enabled item variations.
+        /// </summary>
+        /// <param name="merchantID">
+        /// The merchant's ID. Defaults to the client's owner if omitted.
+        /// </param>
+        async public Task<InventoryEntry[]> ListInventory(string merchantID = "me")
+        {
+            return await fetchPaginated<InventoryEntry>(merchantID, "/inventory");
         }
 
         async protected Task<T> parseResponse<T>(HttpResponseMessage response)
@@ -75,70 +232,6 @@ namespace SquareSharp
             }
 
             return results.Take(limit).ToArray();
-        }
-
-        async public Task<Merchant> GetMerchant(string merchantID = "me")
-        {
-            return await fetch<Merchant>(merchantID, ""); // This corresponds to "/api/1/:merchant_id"
-        }
-
-        async public Task<Payment[]> ListPayments(
-            string merchantID = "me",
-            DateTime? beginTime = null,
-            DateTime? endTime = null,
-            Order order = Order.ASC,
-            int limit = int.MaxValue
-        )
-        {
-            return await fetchPaginated<Payment>(
-                merchantID,
-                "/payments",
-                new NameValueCollection() {
-                    {"begin_time", DateHelper.ToISO(beginTime)},
-                    {"end_time", DateHelper.ToISO(endTime)},
-                    {"order", order.ToString()},
-                    {"limit", Math.Min(200, limit).ToString()}
-                },
-                limit
-            );
-        }
-
-        async public Task<Refund[]> ListRefunds(
-            string merchantID = "me",
-            DateTime? beginTime = null,
-            DateTime? endTime = null,
-            Order order = Order.ASC,
-            int limit = int.MaxValue
-        )
-        {
-            return await fetchPaginated<Refund>(
-                merchantID,
-                "/refunds",
-                new NameValueCollection() {
-                    {"begin_time", DateHelper.ToISO(beginTime)},
-                    {"end_time", DateHelper.ToISO(endTime)},
-                    {"order", order.ToString()},
-                    {"limit", Math.Min(200, limit).ToString()}
-                },
-                limit
-            );
-        }
-
-        async public Task<Item[]> ListItems(string merchantID = "me", int limit = int.MaxValue)
-        {
-            return await fetchPaginated<Item>(
-                merchantID,
-                "/items",
-                new NameValueCollection() {
-                    {"limit", Math.Min(1000, limit).ToString()}
-                },
-                limit
-            );
-        }
-
-        async public Task<InventoryEntry[]> ListInventory(string merchantID = "me")
-        {
-            return await fetchPaginated<InventoryEntry>(merchantID, "/inventory");
         }
     }
 
