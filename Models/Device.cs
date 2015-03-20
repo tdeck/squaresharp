@@ -2,21 +2,22 @@ using System.Runtime.Serialization;
 
 namespace SquareSharp.Models
 {
-    [DataContract]
     /// <summary>
     /// Represents a device running Square Register.
     /// </summary>
+    [DataContract]
     public class Device
     {
-        [DataMember]
         /// <summary>
         /// The device's Square-issued ID.
         /// </summary>
-        public string id;
         [DataMember]
+        public string id;
+
         /// <summary>
         /// The device's merchant-specified name.
         /// </summary>
+        [DataMember]
         public string name;
     }
 }

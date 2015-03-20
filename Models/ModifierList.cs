@@ -2,31 +2,34 @@ using System.Runtime.Serialization;
 
 namespace SquareSharp.Models
 {
-    [DataContract]
     /// <summary>
     /// Represents an item modifier list.
     /// </summary>
+    [DataContract]
     public class ModifierList
     {
-        [DataMember]
         /// <summary>
         /// The modifier list's unique ID.
         /// </summary>
-        public string id;
         [DataMember]
+        public string id;
+
         /// <summary>
         /// The modifier list's name.
         /// </summary>
+        [DataMember]
         public string name;
-        [DataMember(Name = "selection_type")]
+
         /// <summary>
         /// Indicates whether MULTIPLE options or a SINGLE option from the modifier list can be applied to a single item.
         /// </summary>
+        [DataMember(Name = "selection_type")]
         public string selectionType;
-        [DataMember(Name = "modifier_options")]
+
         /// <summary>
         /// The options included in the modifier list.
         /// </summary>
+        [DataMember(Name = "modifier_options")]
         public ModifierOption[] modifierOptions;
     }
 }

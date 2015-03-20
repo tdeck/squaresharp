@@ -17,11 +17,13 @@ namespace SquareSharp
     public class SquareClient
     {
         private HttpClient httpClient;
+        private string domain;
 
         /// <summary>Creates a Square Connect API client.</summary>
         /// <param name="accessToken">Your application's OAuth access token.</param>
-        public SquareClient(string accessToken)
+        public SquareClient(string accessToken, string domain = "https://connect.squareup.com")
         {
+            this.domain = domain;
             this.httpClient = new HttpClient();
             this.httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", accessToken);
@@ -195,7 +197,7 @@ namespace SquareSharp
 
         async protected Task<T> fetch<T>(string merchantID, string path, NameValueCollection query = null)
         {
-            var requestURL = "https://connect.squareup.com/v1/" + merchantID + path
+            var requestURL = domain + "/v1/" + merchantID + path
                 + QueryString.Encode(query);
             using (var response = await httpClient.GetAsync(requestURL))
             {
@@ -212,7 +214,7 @@ namespace SquareSharp
         {
             var results = new List<T>();
 
-            var requestURL = "https://connect.squareup.com/v1/" + merchantID + path
+            var requestURL = domain + "/v1/" + merchantID + path
                 + QueryString.Encode(query);
             while (results.Count() < limit) // Keep fetching while we get back Link headers
             {
