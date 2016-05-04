@@ -22,7 +22,8 @@ foreach (var payment in payments)
 }
 ```
 # Development
-I am actively developing SquareSharp, and happy to take contributions as well. Please report any bugs you find through the GitHub bug tracker.
+
+I've put this project on hold as I don't currently have a use for it, but if you'd like a new feature or can contribute something I'd be happy to pick it up again.
 
 # License
 [MIT License](http://troy.mit-license.org/)
